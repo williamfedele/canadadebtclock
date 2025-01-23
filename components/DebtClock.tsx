@@ -66,7 +66,7 @@ export default function DebtClock() {
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
-            National Debt 2015
+            Federal Debt 2015
           </h2>
           <p className="text-red-500 font-mono">
             {(612300000000).toLocaleString()}
