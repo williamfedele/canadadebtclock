@@ -1,118 +1,97 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import useSWR from "swr";
+import { calculateCurrentStats } from "@/utils/calculations";
 
-interface DebtData {
-  nationalDebt: number;
-  debtPerCitizen: number;
-  debtToGDPRatio: number;
-  population: number;
-  gdp: number;
-  lastUpdate: number;
-  increaseRate: number;
-}
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-export default function CanadianDebtClock() {
-  const { data, error } = useSWR<DebtData>("/api/debt-data", fetcher, {
-    refreshInterval: 2.5 * 60 * 1000, // 2.5 minutes
-    keepPreviousData: true,
-  });
-
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentDebt, setCurrentDebt] = useState(0);
+export default function DebtClock() {
+  const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState(() => calculateCurrentStats());
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    setMounted(true);
+    const timer = setInterval(() => {
+      setStats(calculateCurrentStats());
+    }, 50);
 
-    if (!data) return;
+    return () => clearInterval(timer);
+  }, []);
 
-    const updateDebt = () => {
-      const now = Date.now();
-      const msSinceUpdate = now - data.lastUpdate;
-      const increase = (data.increaseRate / 1000) * msSinceUpdate;
-      setCurrentDebt(data.nationalDebt + increase);
-    };
-    const debtTimer = setInterval(updateDebt, 50);
-    updateDebt();
-
-    return () => {
-      clearInterval(timer);
-      clearInterval(debtTimer);
-    };
-  }, [data]);
-
-  if (error) return <div>Failed to load debt data</div>;
-  if (!data) return <div>Loading...</div>;
+  if (!mounted) return null;
 
   return (
-    <div className="border border-dotted rounded-none p-8 text-lg">
-      <h1 className="text-2xl sm:text-3xl font-black mb-8 tracking-wider">
+    <div className="border rounded-lg p-8 text-lg md:text-xl">
+      <h1 className="text-2xl sm:text-3xl font-black mb-8 uppercase font-mono">
         Canadian Debt Clock
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div>
-          <h2 className="text-sm uppercase tracking-widest">National Debt</h2>
-          <p className="text-red-500 font-extrabold">
-            {Math.floor(currentDebt).toLocaleString()}
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Federal Debt
+          </h2>
+          <p className="text-red-500 font-mono">
+            ${Math.floor(stats.debt).toLocaleString()}
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest">
+          <h2 className="text-sm uppercase tracking-widest font-bold">
             Debt per Citizen
           </h2>
-          <p className="text-red-500 font-extrabold">
-            ${data.debtPerCitizen.toLocaleString()}
+          <p className="text-red-500 font-mono">
+            ${stats.debtPerCitizen.toLocaleString()}
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest">
-            Debt to GDP Ratio
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Debt-to-GDP Ratio 2024
           </h2>
-          <p className="text-red-500 font-extrabold">
-            {data.debtToGDPRatio.toFixed(2)}%
+          <p className="text-red-500 font-mono">
+            {stats.debtToGDPRatio.toFixed(2)}%
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest">
-            Daily Debt Increase
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Debt Increase/Minute
           </h2>
-          <p className="text-red-500 font-extrabold">
-            {Math.floor(data.increaseRate * 3600 * 24).toLocaleString()}
+          <p className="text-red-500 font-mono">
+            {Math.floor(stats.increaseRate * 60).toLocaleString()}
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest">
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Debt Increase/Day
+          </h2>
+          <p className="text-red-500 font-mono">
+            {Math.floor(stats.increaseRate * 86_400).toLocaleString()}
+          </p>
+        </div>
+        <div>
+          <h2 className="text-sm uppercase tracking-widest font-bold">
             National Debt 2015
           </h2>
-          <p className="text-red-500 font-extrabold">
+          <p className="text-red-500 font-mono">
             {(612300000000).toLocaleString()}
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest">
-            Largest Deficit (2021)
+          <h2 className="text-sm uppercase tracking-widest font-bold text-wrap">
+            Largest Deficit 2021
           </h2>
-          <p className="text-red-500 font-extrabold">
+          <p className="text-red-500 font-mono">
             {(327700000000).toLocaleString()}
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest">Population</h2>
-          <p className="font-extrabold">{data.population.toLocaleString()}</p>
-        </div>
-        <div>
-          <h2 className="text-sm uppercase tracking-widest">GDP</h2>
-          <p className="text-green-500 font-extrabold">
-            ${data.gdp.toLocaleString()}
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Population
+          </h2>
+          <p className="font-mono">
+            {Math.floor(stats.population).toLocaleString()}
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest">Current Time</h2>
-          <p className="font-extrabold">
-            {currentTime.toLocaleString("en-GB", { hour12: false })}
+          <h2 className="text-sm uppercase tracking-widest font-bold">GDP</h2>
+          <p className="text-green-500 font-mono">
+            ${Math.floor(stats.gdp).toLocaleString()}
           </p>
         </div>
       </div>
