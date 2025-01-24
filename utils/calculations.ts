@@ -1,6 +1,8 @@
 import {
   REFERENCE_TIME,
   BASE_DEBT,
+  LAST_FEDERAL_DEBT,
+  LAST_DEFICIT,
   DEBT_INCREASE_PER_SECOND,
   BASE_GDP,
   LAST_GDP_RATIO,
@@ -30,16 +32,21 @@ export function calculateCurrentStats() {
     BASE_POPULATION +
     (POPULATION_INCREASE_PER_SECOND * (now - LAST_POPULATION_UPDATE)) / 1000;
 
+  const debtThisYear = currentDebt - LAST_FEDERAL_DEBT;
+  const debtDelta = debtThisYear - LAST_DEFICIT;
   const debtPerCitizen = currentDebt / currentPopulation;
   const debtToGDPRatio = (currentDebt / currentGDP) * 100;
 
   return {
     debt: currentDebt,
+    debtThisYear: debtThisYear,
+    debtDelta: debtDelta,
     debtPerCitizen: debtPerCitizen,
     debtToGDPRatio: debtToGDPRatio,
     population: currentPopulation,
     gdp: currentGDP,
     lastUpdate: now,
-    increaseRate: DEBT_INCREASE_PER_SECOND,
+    debtIncreaseRate: DEBT_INCREASE_PER_SECOND,
+    populationIncreaseRate: POPULATION_INCREASE_PER_SECOND,
   };
 }

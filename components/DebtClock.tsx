@@ -9,27 +9,55 @@ export default function DebtClock() {
 
   useEffect(() => {
     setMounted(true);
-    const timer = setInterval(() => {
-      setStats(calculateCurrentStats());
-    }, 50);
 
-    return () => clearInterval(timer);
+    let animationFrameId: number;
+
+    const updateStats = () => {
+      setStats(calculateCurrentStats());
+      animationFrameId = requestAnimationFrame(updateStats);
+    };
+
+    animationFrameId = requestAnimationFrame(updateStats);
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
   if (!mounted) return null;
 
   return (
-    <div className="border rounded-lg p-8 text-lg md:text-xl">
-      <h1 className="text-2xl sm:text-3xl font-black mb-8 uppercase font-mono">
+    <div className="border rounded-lg p-4 lg:p-8 text-lg lg:text-xl">
+      <h1 className="text-2xl sm:text-2xl font-black mb-4 lg:mb-8 uppercase font-mono">
         Canadian Debt Clock
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-1 lg:gap-y-4 gap-x-8 lg:gap-x-16">
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
             Federal Debt
           </h2>
           <p className="text-red-500 font-mono">
             ${Math.floor(stats.debt).toLocaleString()}
+          </p>
+        </div>
+        <div>
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Debt this Year
+          </h2>
+          <p className="text-red-500 font-mono">
+            ${Math.floor(stats.debtThisYear).toLocaleString()}
+          </p>
+        </div>
+        <div>
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Debt Delta
+          </h2>
+          <p
+            className={`font-mono ${stats.debtDelta < 0 ? "text-green-500" : "text-red-500"}`}
+          >
+            ${Math.floor(stats.debtDelta).toLocaleString()}
           </p>
         </div>
         <div>
@@ -53,7 +81,7 @@ export default function DebtClock() {
             Debt Increase/Minute
           </h2>
           <p className="text-red-500 font-mono">
-            {Math.floor(stats.increaseRate * 60).toLocaleString()}
+            {Math.floor(stats.debtIncreaseRate * 60).toLocaleString()}
           </p>
         </div>
         <div>
@@ -61,7 +89,7 @@ export default function DebtClock() {
             Debt Increase/Day
           </h2>
           <p className="text-red-500 font-mono">
-            {Math.floor(stats.increaseRate * 86_400).toLocaleString()}
+            {Math.floor(stats.debtIncreaseRate * 86_400).toLocaleString()}
           </p>
         </div>
         <div>
@@ -81,6 +109,12 @@ export default function DebtClock() {
           </p>
         </div>
         <div>
+          <h2 className="text-sm uppercase tracking-widest font-bold">GDP</h2>
+          <p className="text-green-500 font-mono">
+            ${Math.floor(stats.gdp).toLocaleString()}
+          </p>
+        </div>
+        <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
             Population
           </h2>
@@ -89,9 +123,11 @@ export default function DebtClock() {
           </p>
         </div>
         <div>
-          <h2 className="text-sm uppercase tracking-widest font-bold">GDP</h2>
-          <p className="text-green-500 font-mono">
-            ${Math.floor(stats.gdp).toLocaleString()}
+          <h2 className="text-sm uppercase tracking-widest font-bold">
+            Pop Growth/Day
+          </h2>
+          <p className="font-mono">
+            {Math.floor(stats.populationIncreaseRate * 86400).toLocaleString()}
           </p>
         </div>
       </div>

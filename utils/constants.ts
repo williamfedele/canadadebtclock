@@ -3,7 +3,7 @@ import { FiscalEntry } from "@/utils/types";
 export const REFERENCE_TIME = Date.now();
 
 // Taken from annual fiscal reports
-export const FISCAL_ENTRIES: FiscalEntry[] = [
+const FISCAL_ENTRIES: FiscalEntry[] = [
   {
     debt: BigInt(1_048_746_000_000),
     revenue: BigInt(316_446 * 1_000_000),
@@ -31,11 +31,14 @@ export const FISCAL_ENTRIES: FiscalEntry[] = [
 ];
 
 // Used to calculate the catch-up increases
-export const LAST_FISCAL_DATE =
+const LAST_FISCAL_DATE =
   FISCAL_ENTRIES[FISCAL_ENTRIES.length - 1].fiscalYearEnd.getTime();
 export const LAST_GDP_RATIO =
   FISCAL_ENTRIES[FISCAL_ENTRIES.length - 1].deptToGPDRatio / 100;
-export const CATCH_UP_SECONDS = (REFERENCE_TIME - LAST_FISCAL_DATE) / 1000;
+export const LAST_FEDERAL_DEBT = Number(
+  FISCAL_ENTRIES[FISCAL_ENTRIES.length - 1].debt,
+);
+const CATCH_UP_SECONDS = (REFERENCE_TIME - LAST_FISCAL_DATE) / 1000;
 
 // DEBT
 const calculateDebtChangePerSecond = (fiscalEntries: FiscalEntry[]): number => {
@@ -53,6 +56,10 @@ const calculateDebtChangePerSecond = (fiscalEntries: FiscalEntry[]): number => {
   // Convert to per second rate at the last possible moment
   return Number(debtDiff) / timeDiffSeconds;
 };
+
+export const LAST_DEFICIT =
+  Number(FISCAL_ENTRIES[FISCAL_ENTRIES.length - 1].debt) -
+  Number(FISCAL_ENTRIES[FISCAL_ENTRIES.length - 2].debt);
 
 export const DEBT_INCREASE_PER_SECOND =
   calculateDebtChangePerSecond(FISCAL_ENTRIES);

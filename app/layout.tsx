@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Doto } from "next/font/google";
 import "./globals.css";
@@ -18,7 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${doto.className}`}>{children}</body>
+      <body className={`${doto.className}`}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
