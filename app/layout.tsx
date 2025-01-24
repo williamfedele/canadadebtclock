@@ -1,10 +1,17 @@
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Doto } from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
 const doto = Doto({
   subsets: ["latin"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -19,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${doto.className}`}>
+      <body className={`${doto.className} ${ibmPlexMono.variable}`}>
         {children}
         <Analytics />
       </body>

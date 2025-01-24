@@ -3,6 +3,16 @@
 import { useState, useEffect } from "react";
 import { calculateCurrentStats } from "@/utils/calculations";
 
+const cad = new Intl.NumberFormat("en-CA", {
+  style: "currency",
+  currency: "CAD",
+  maximumFractionDigits: 0,
+});
+
+const num = new Intl.NumberFormat("en-CA", {
+  maximumFractionDigits: 0,
+});
+
 export default function DebtClock() {
   const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState(() => calculateCurrentStats());
@@ -29,25 +39,23 @@ export default function DebtClock() {
   if (!mounted) return null;
 
   return (
-    <div className="border rounded-lg p-4 lg:p-8 text-lg lg:text-xl">
-      <h1 className="text-2xl sm:text-2xl font-black mb-4 lg:mb-8 uppercase font-mono">
-        Canadian Debt Clock
+    <div className="border rounded-lg border-gray-500 py-4 px-8 lg:py-8 lg:px-16 text-lg lg:text-xl">
+      <h1 className="text-2xl sm:text-2xl font-semibold mb-4 lg:mb-8 uppercase font-mono">
+        Canada Debt Clock
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-1 lg:gap-y-4 gap-x-8 lg:gap-x-16">
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
             Federal Debt
           </h2>
-          <p className="text-red-500 font-mono">
-            ${Math.floor(stats.debt).toLocaleString()}
-          </p>
+          <p className="text-red-500 font-mono">{cad.format(stats.debt)}</p>
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
             Debt this Year
           </h2>
           <p className="text-red-500 font-mono">
-            ${Math.floor(stats.debtThisYear).toLocaleString()}
+            {cad.format(stats.debtThisYear)}
           </p>
         </div>
         <div>
@@ -57,7 +65,7 @@ export default function DebtClock() {
           <p
             className={`font-mono ${stats.debtDelta < 0 ? "text-green-500" : "text-red-500"}`}
           >
-            ${Math.floor(stats.debtDelta).toLocaleString()}
+            {cad.format(stats.debtDelta)}
           </p>
         </div>
         <div>
@@ -65,7 +73,7 @@ export default function DebtClock() {
             Debt per Citizen
           </h2>
           <p className="text-red-500 font-mono">
-            ${stats.debtPerCitizen.toLocaleString()}
+            {cad.format(stats.debtPerCitizen)}
           </p>
         </div>
         <div>
@@ -81,7 +89,7 @@ export default function DebtClock() {
             Debt Increase/Minute
           </h2>
           <p className="text-red-500 font-mono">
-            {Math.floor(stats.debtIncreaseRate * 60).toLocaleString()}
+            {cad.format(stats.debtIncreaseRate * 60)}
           </p>
         </div>
         <div>
@@ -89,45 +97,37 @@ export default function DebtClock() {
             Debt Increase/Day
           </h2>
           <p className="text-red-500 font-mono">
-            {Math.floor(stats.debtIncreaseRate * 86_400).toLocaleString()}
+            {cad.format(stats.debtIncreaseRate * 86_400)}
           </p>
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
             Federal Debt 2015
           </h2>
-          <p className="text-red-500 font-mono">
-            {(612300000000).toLocaleString()}
-          </p>
+          <p className="text-red-500 font-mono">{cad.format(612300000000)}</p>
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold text-wrap">
             Largest Deficit 2021
           </h2>
-          <p className="text-red-500 font-mono">
-            {(327700000000).toLocaleString()}
-          </p>
+          <p className="text-red-500 font-mono">{cad.format(327700000000)}</p>
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">GDP</h2>
-          <p className="text-green-500 font-mono">
-            ${Math.floor(stats.gdp).toLocaleString()}
-          </p>
+          <p className="text-green-500 font-mono">{cad.format(stats.gdp)}</p>
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
             Population
           </h2>
-          <p className="font-mono">
-            {Math.floor(stats.population).toLocaleString()}
-          </p>
+          <p className="font-mono">{num.format(stats.population)}</p>
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-widest font-bold">
             Pop Growth/Day
           </h2>
           <p className="font-mono">
-            {Math.floor(stats.populationIncreaseRate * 86400).toLocaleString()}
+            {num.format(stats.populationIncreaseRate * 86400)}
           </p>
         </div>
       </div>
