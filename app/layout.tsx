@@ -16,7 +16,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "Canada Debt Clock",
-  description: "Canada's national debt in real-time",
+  description: "Canada's federal debt in real-time",
 };
 
 export default function RootLayout({
